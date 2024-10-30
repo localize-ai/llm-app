@@ -41,7 +41,11 @@ def generate_image_embedding(image_url):
     image = Image.open(BytesIO(response.content))
 
     # Generate the embedding
-    return model.encode(image, convert_to_tensor=True).tolist()
+    return model.encode(
+        image,
+        convert_to_tensor=True,
+        device="cuda",
+    ).tolist()
 
 
 # Function to process data and insert into MongoDB
