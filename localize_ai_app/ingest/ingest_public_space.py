@@ -60,7 +60,7 @@ def process_and_insert_data(input_data):
 
         # Create the main dictionary structure
         place_doc = {
-            "cid": place["cid"],
+            "_id": place["cid"],
             "title": place["title"],
             "categories": place["categories"],
             "address": place["address"],
@@ -84,8 +84,12 @@ def process_and_insert_data(input_data):
             "images": image_urls,
         }
 
-        # Insert the place document into the places collection and get the inserted ID
-        place_id = places_collection.insert_one(place_doc).inserted_id
+        # Insert the place document into the places collection and get the inserted ID, if error duplicate key, then continue to next place
+        try:
+            place_id = places_collection.insert_one(place_doc).inserted_id
+        except Exception as e:
+            print(f"Error inserting place i: {index}: {e}")
+            continue
 
         # Generate text embedding
         text = f"title: {place['title']}; description: {place['description']}; address: {place['address']}"
@@ -116,7 +120,6 @@ def process_and_insert_data(input_data):
         print(
             f"Processed {index} places in each place in {time.time() - each_place_start_time:.2f} seconds"
         )
-
 
     print(f"Processed {index} places in {time.time() - start_time:.2f} seconds")
 
