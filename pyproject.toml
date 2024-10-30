@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "localize-ai-app"
+version = "0.1.0"
+description = ""
+authors = ["\"Luthfi Arifin\" <luthfiarifin0222@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.3"
+sentence-transformers = "^3.2.1"
+transformers = "^4.46.1"
+pymongo = "^4.10.1"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
