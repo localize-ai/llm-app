@@ -111,15 +111,19 @@ def process_and_insert_data(input_data):
 
         # Generate embeddings for each image URL
         for url in image_urls:
-            image_embedding = generate_image_embedding(url)
-            embedding_collection.insert_one(
-                {
-                    "place_id": place_id,
-                    "type": "image",
-                    "content": url,
-                    "embedding": image_embedding,
-                }
-            )
+            try:
+                image_embedding = generate_image_embedding(url)
+                embedding_collection.insert_one(
+                    {
+                        "place_id": place_id,
+                        "type": "image",
+                        "content": url,
+                        "embedding": image_embedding,
+                    }
+                )
+            except Exception as e:
+                print(f"Error generating embedding for image {url}: {e}")
+                continue
 
         print(
             f"Processed {index} places in each place in {time.time() - each_place_start_time:.2f} seconds"
