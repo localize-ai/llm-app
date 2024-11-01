@@ -12,6 +12,7 @@ sentence-transformers = "^3.2.1"
 transformers = "^4.46.1"
 pymongo = "^4.10.1"
 python-dotenv = "^1.0.1"
+uvicorn = "^0.32.0"
 
 
 [build-system]
