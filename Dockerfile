@@ -28,4 +28,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
 
-ENTRYPOINT ["python", "-m", "app.main"]
+ENTRYPOINT ["uvicorn", "app.main:app", '--host', '0.0.0.0', '--port', '8080']
