@@ -27,7 +27,7 @@ class SearchTextChain:
         logging.info(f"Retrieved detailed information for {len(places)} places")
 
         # Add thumbnail URLs to the places if available from embeddings
-        add_places_thumbnail(embeddings, places)
+        places = add_places_thumbnail(embeddings, places)
 
         return {
             "places": places,
