@@ -29,4 +29,7 @@ class SearchTextChain:
         # Add thumbnail URLs to the places if available from embeddings
         add_places_thumbnail(embeddings, places)
 
-        return places
+        return {
+            "places": places,
+            "keyword": keyword,
+        }

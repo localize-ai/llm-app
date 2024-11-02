@@ -20,16 +20,19 @@ class PlacesController:
         if params.q:
             # Search for places based on the search query
             result = self.search_text_chain.search(params)
+            places = result.get("places")
+            keyword = result.get("keyword")
 
             # End the timer
             execution_time = time.time() - start_time
             logging.info(f"The search took {execution_time:.2f} seconds")
 
             return {
-                "data": result,
+                "data": places,
                 "meta": {
                     "execution_time": execution_time,
-                    "total_results": len(result),
+                    "total_results": len(places),
+                    "keyword": keyword,
                 },
             }
         elif params.image_url:
