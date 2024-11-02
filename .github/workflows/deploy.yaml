@@ -40,7 +40,7 @@ jobs:
         with:
           push: true
           tags: laam012/api:localize-ai-llm
-          file: ./Dockerfile.development
+          file: ./Dockerfile
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
