@@ -1,4 +1,4 @@
-FROM python:3.12-buster as builder
+FROM python:3.12 as builder
 
 RUN pip install poetry==1.4.2
 
@@ -19,7 +19,7 @@ RUN cat poetry.lock
 # Install dependencies
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
 
-FROM python:3.12-slim-buster as runtime
+FROM python:3.12-slim as runtime
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
