@@ -1,11 +1,5 @@
 FROM python:3.12 as builder
 
-# Remove unused packages
-sudo rm -rf /usr/share/dotnet
-sudo rm -rf /opt/ghc
-sudo rm -rf "/usr/local/share/boost"
-sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-
 RUN pip install poetry==1.4.2
 
 ENV POETRY_NO_INTERACTION=1 \
@@ -26,13 +20,6 @@ RUN cat poetry.lock
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
 
 FROM python:3.12-slim as runtime
-
-
-# Remove unused packages
-sudo rm -rf /usr/share/dotnet
-sudo rm -rf /opt/ghc
-sudo rm -rf "/usr/local/share/boost"
-sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
