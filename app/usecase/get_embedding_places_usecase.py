@@ -1,7 +1,9 @@
 import os
+
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
+from transformers import CLIPTokenizer
 
 
 # Load the environment variables
@@ -14,14 +16,20 @@ embedding_collection = db[os.getenv("MONGO_PLACE_EMBEDDINGS_COLLECTION")]
 
 # Load the CLIP model and tokenizer
 model = SentenceTransformer("clip-ViT-L-14")
+tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 
 
 def combined_search_places(search_phrase, limit=20):
     """
     Search for places based on a search phrase, combining text and image embeddings.
     """
+    tokens = tokenizer.encode(
+        search_phrase, truncation=True, max_length=77, add_special_tokens=True
+    )
+    truncated_text = tokenizer.decode(tokens, skip_special_tokens=True)
+
     # Encode the search phrase into a vector
-    emb = model.encode(search_phrase)
+    emb = model.encode(truncated_text, convert_to_tensor=True)
 
     # Search separately for text and image embeddings
     text_results = embedding_collection.aggregate(
