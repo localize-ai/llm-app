@@ -28,4 +28,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
 
-ENTRYPOINT ["uvicorn", "app.main:app", '--host', '0.0.0.0', '--port', '8080']
+CMD [ "fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8080" ]
