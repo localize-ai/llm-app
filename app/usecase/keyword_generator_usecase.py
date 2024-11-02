@@ -10,8 +10,8 @@ from langchain_core.runnables import RunnablePassthrough
 load_dotenv()
 
 llm = ChatGroq(
-    model="llama3-70b-8192",
-    temperature=0,
+    model="llama-3.2-90b-text-preview",
+    temperature=1.5,
     max_tokens=None,
     timeout=None,
     max_retries=2,
@@ -23,10 +23,16 @@ llm = ChatGroq(
 system_prompt = """
 Given the following parameters, generate a single search keyword string optimized for vector search to find a specific type of place in a database:
 
-- `q`: (user input text) — the primary search query.
+- `q`: (user input text) — the primary search query, which could be a place name, address, or general search term.
 - `category` (optional) — a specific style or type of place, such as work-friendly, classic-vibes, hidden-gem, etc.
 
-If `category` is provided, include it as a qualifier in the keyword string to narrow down the search intent. If `category` is not provided, rely solely on `q` to form the search keyword. Do not add extra context, and only output a keyword string.
+Instructions:
+
+- If `q` is a place name or address, include it as is in the keyword string without modification.
+- If `category` is provided, include it as a qualifier in the keyword string to narrow down the search intent.
+- If `category` is not provided, rely solely on `q` to form the search keyword.
+- Do not add extra context, and only output the keyword string.
+- **Just return the keyword string.**
 
 ## Input:
 - `q`: {q}
