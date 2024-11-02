@@ -1,7 +1,8 @@
 import logging
 import time
-from dto.search_dto import SearchParam
-from chain.search_text_chain import SearchTextChain
+
+from app.dto.search_dto import SearchParam
+from app.chain.search_text_chain import SearchTextChain
 
 
 class PlacesController:

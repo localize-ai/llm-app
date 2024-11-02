@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from dto.search_dto import SearchParam
-from controller.places_controller import PlacesController
+from app.dto.search_dto import SearchParam
+from app.controller.places_controller import PlacesController
 
 router = APIRouter()
 places_controller = PlacesController()

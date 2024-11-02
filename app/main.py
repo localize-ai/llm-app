@@ -1,6 +1,6 @@
 import logging
 from fastapi import FastAPI
-from router import places_router
+from app.router import places_router
 
 app = FastAPI()
 

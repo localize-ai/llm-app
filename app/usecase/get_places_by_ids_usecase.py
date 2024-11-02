@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from helper.object_id_converter import convert_object_id_to_str
+from app.helper.object_id_converter import convert_object_id_to_str
 
 load_dotenv()
 
