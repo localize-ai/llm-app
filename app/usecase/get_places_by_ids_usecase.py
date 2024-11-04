@@ -40,5 +40,10 @@ def get_places_by_ids(embeddings: list):
         ]
     )
 
+    # Add score to the places
+    places = list(convert_object_id_to_str(places))
+    for i, place in enumerate(places):
+        place["score"] = embeddings[i]["score"]
+
     # Convert the ObjectIds to strings
-    return list(convert_object_id_to_str(places))
+    return places
