@@ -46,7 +46,7 @@ Instructions:
 - If `category` is not provided, rely solely on `q` to form the `keyword`.
 - Determine the value of `is_image_search`. If the query is a place name or address, set `is_image_search` to `false`. Otherwise, set it to `true`.
 - Do not add extra context, and only output the JSON object.
-- **Just return the JSON object.**
+- **Return with the ```json``` tag.**
 
 ## Input:
 - `q`: {q}
