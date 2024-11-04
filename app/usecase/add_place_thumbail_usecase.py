@@ -8,7 +8,7 @@ def add_places_thumbnail(embeddings: list, places: list):
     # Insert new images at the beginning of the images list
     for embedding in embeddings:
         place_id = embedding["place_id"]
-        if place_id in place_dict:
+        if place_id in place_dict and embedding["type"] == "image":
             place = place_dict[place_id]
             if "images" not in place:
                 place["images"] = []
