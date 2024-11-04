@@ -18,10 +18,27 @@ def get_places_by_ids(embeddings: list):
     Get places by their IDs from the database.
     """
     ids = [place["place_id"] for place in embeddings]
-    print(ids)
 
     # Find the places based on the provided IDs
-    places = places_collection.find({"_id": {"$in": ids}})
+    places = places_collection.aggregate(
+        [
+            {
+                "$match": {
+                    "_id": {"$in": ids},
+                },
+            },
+            {
+                "$addFields": {
+                    "index": {"$indexOfArray": [ids, "$_id"]},
+                },
+            },
+            {
+                "$sort": {
+                    "index": 1,
+                },
+            },
+        ]
+    )
 
     # Convert the ObjectIds to strings
     return list(convert_object_id_to_str(places))
