@@ -19,6 +19,53 @@ model = SentenceTransformer("clip-ViT-L-14")
 tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 
 
+def search_text_places(search_phrase, limit=20):
+    """
+    Search for places based on a search phrase.
+    """
+    tokens = tokenizer.encode(
+        search_phrase, truncation=True, max_length=77, add_special_tokens=True
+    )
+    truncated_text = tokenizer.decode(tokens, skip_special_tokens=True)
+
+    # Encode the search phrase into a vector
+    emb = model.encode(truncated_text, convert_to_tensor=True)
+
+    # Search for text embeddings
+    results = embedding_collection.aggregate(
+        [
+            {
+                "$vectorSearch": {
+                    "index": "default",
+                    "path": "embedding",
+                    "queryVector": emb.tolist(),
+                    "numCandidates": limit * 5,
+                    "limit": limit * 2,
+                    "filter": {"type": "text"},
+                }
+            },
+            {
+                "$project": {
+                    "_id": 1,
+                    "content": 1,
+                    "type": 1,
+                    "place_id": 1,
+                    "score": {"$meta": "vectorSearchScore"},
+                }
+            },
+        ]
+    )
+
+    # Distinct results by place_id
+    results = {doc["place_id"]: doc for doc in results}.values()
+
+    # Sort the combined results by score
+    results = sorted(results, key=lambda x: x["score"], reverse=True)
+
+    # Limit the number of results
+    return results[:limit]
+
+
 def combined_search_places(search_phrase, limit=20):
     """
     Search for places based on a search phrase, combining text and image embeddings.
@@ -39,8 +86,8 @@ def combined_search_places(search_phrase, limit=20):
                     "index": "default",
                     "path": "embedding",
                     "queryVector": emb.tolist(),
-                    "numCandidates": 100,
-                    "limit": 50,
+                    "numCandidates": limit * 5,
+                    "limit": limit * 2.5,
                     "filter": {"type": "text"},
                 }
             },
@@ -63,8 +110,8 @@ def combined_search_places(search_phrase, limit=20):
                     "index": "default",
                     "path": "embedding",
                     "queryVector": emb.tolist(),
-                    "numCandidates": 100,
-                    "limit": 50,
+                    "numCandidates": limit * 5,
+                    "limit": limit * 2.5,
                     "filter": {"type": "image"},
                 }
             },
@@ -85,7 +132,7 @@ def combined_search_places(search_phrase, limit=20):
     image_results = list(image_results)
 
     for result in image_results:
-        result["score"] *= 1.25  # Adjust multiplier as needed
+        result["score"] *= 1.25
 
     # Combine results
     combined_results = text_results + image_results

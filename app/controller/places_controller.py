@@ -35,6 +35,7 @@ class PlacesController:
                     "execution_time": execution_time,
                     "total_results": len(places),
                     "keyword": keyword,
+                    "is_image_search": result.get("is_image_search"),
                 },
             }
         elif params.image_url:
