@@ -5,7 +5,8 @@ import requests
 from PIL import Image
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from sentence_transformers import SentenceTransformer
+
+from app.model.clip_model import clip_model
 
 # Load the environment variables
 load_dotenv()
@@ -15,9 +16,6 @@ client = MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("MONGO_DB_NAME")]
 embedding_collection = db[os.getenv("MONGO_PLACE_EMBEDDINGS_COLLECTION")]
 
-# Load the CLIP model and tokenizer
-model = SentenceTransformer("clip-ViT-L-14")
-
 
 def image_vector_search(image_url, limit=20):
     """
@@ -26,7 +24,7 @@ def image_vector_search(image_url, limit=20):
     response = requests.get(image_url)
     response.raise_for_status()  # Ensure the request was successful
     image = Image.open(BytesIO(response.content))
-    emb = model.encode(
+    emb = clip_model.encode(
         image,
         convert_to_tensor=True,
         device="cpu",
