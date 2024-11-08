@@ -57,8 +57,12 @@ def process_and_insert_data(input_data):
         index += 1
         each_place_start_time = time.time()
 
-        # Add image embeddings for `thumbnail`, `images`, and `user_reviews`
-        image_urls = [place["thumbnail"]] + [img["image"] for img in place["images"]]
+        # Add image embeddings for `thumbnail` (if not null), `images`, and `user_reviews`
+        image_urls = [img["image"] for img in place["images"]]
+
+        if place["thumbnail"] is not None:
+            image_urls.insert(0, place["thumbnail"])
+
         for review in place["user_reviews"]:
             image_urls.extend(review.get("Images", []))
 
@@ -124,6 +128,19 @@ def process_and_insert_data(input_data):
             except Exception as e:
                 print(f"Error generating embedding for image {url}: {e}")
                 continue
+
+        # Insert text embedding for each user review with rating > 3
+        for review in place["user_reviews"]:
+            review_text = f"review: {review['Description']}; rating: {review['Rating']}"
+            review_embedding = generate_text_embedding(review_text)
+            embedding_collection.insert_one(
+                {
+                    "place_id": place_id,
+                    "type": "review_text",
+                    "content": review_text,
+                    "embedding": review_embedding,
+                }
+            )
 
         print(
             f"Processed {index} places in each place in {time.time() - each_place_start_time:.2f} seconds"
