@@ -88,5 +88,14 @@ def generate_keyword(search_phrase, category=None) -> KeywordGeneratorResponse:
     """
     Generate a keyword string based on the search phrase and category.
     """
-    # Run the keyword generator chain
-    return keyword_generator_chain.invoke({"q": search_phrase, "category": category})
+    retries = 3
+    for attempt in range(retries):
+        try:
+            # Run the keyword generator chain
+            return keyword_generator_chain.invoke({"q": search_phrase, "category": category})
+        except Exception as e:
+            if attempt < retries - 1:
+                print(f"Attempt {attempt + 1} failed: {e}. Retrying...")
+            else:
+                print(f"Attempt {attempt + 1} failed: {e}. No more retries left.")
+                raise
