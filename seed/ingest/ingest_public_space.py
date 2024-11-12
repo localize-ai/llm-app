@@ -21,6 +21,7 @@ tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("MONGO_DB_NAME")]
 places_collection = db[os.getenv("MONGO_PLACES_COLLECTION")]
+place_reviews_collection = db[os.getenv("MONGO_PLACES_REVIEWS_COLLECTION")]
 embedding_collection = db[os.getenv("MONGO_PLACE_EMBEDDINGS_COLLECTION")]
 
 
@@ -141,6 +142,19 @@ def process_and_insert_data(input_data):
                     "embedding": review_embedding,
                 }
             )
+
+        place_reviews_collection.insert_many(
+            [
+                {
+                    "place_id": place_id,
+                    "rating": review["Rating"],
+                    "review": review["Description"],
+                    "images": review.get("Images", []),
+                    "user": None,
+                }
+                for review in place["user_reviews"]
+            ]
+        )
 
         print(
             f"Processed {index} places in each place in {time.time() - each_place_start_time:.2f} seconds"
