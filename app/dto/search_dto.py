@@ -15,3 +15,4 @@ class SearchParam(BaseModel):
     q: str | None = None
     image_url: str | None = None
     category: SearchCategory | None = None
+    limit: int = Query(20, ge=1, le=50)

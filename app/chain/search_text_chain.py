@@ -3,7 +3,10 @@ import logging
 from app.dto.search_dto import SearchParam
 from app.usecase.add_place_thumbail_usecase import add_places_thumbnail
 from app.usecase.get_places_by_ids_usecase import get_places_by_ids
-from app.usecase.get_embedding_places_usecase import combined_search_places, search_text_places
+from app.usecase.get_embedding_places_usecase import (
+    combined_search_places,
+    search_text_places,
+)
 from app.usecase.keyword_generator_usecase import generate_keyword
 
 
@@ -19,7 +22,17 @@ class SearchTextChain:
         logging.info(f"Generated keyword: {generator}")
 
         # Search for places based on the generated keyword
-        embeddings = combined_search_places(generator.keyword) if generator.is_image_search else search_text_places(generator.keyword)
+        embeddings = (
+            combined_search_places(
+                generator.keyword,
+                limit=dto.limit,
+            )
+            if generator.is_image_search
+            else search_text_places(
+                generator.keyword,
+                limit=dto.limit,
+            )
+        )
         logging.info(f"Found {len(embeddings)} embeddings")
 
         # Get detailed information for each place
