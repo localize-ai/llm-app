@@ -1,8 +1,8 @@
 import os
 
 from dotenv import load_dotenv
+from langchain_aws import ChatBedrock
 from langchain_groq import ChatGroq
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from pydantic import BaseModel, Field
@@ -22,15 +22,28 @@ class KeywordGeneratorResponse(BaseModel):
     )
 
 
-llm = ChatGroq(
-    model="llama-3.2-90b-text-preview",
-    temperature=1.5,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
-    api_key=os.getenv("GROQ_API_KEY"),
-    verbose=True,
-)
+if (
+    os.getenv("AWS_SECRET_ACCESS_KEY") is not None
+    and os.getenv("AWS_ACCESS_KEY_ID") is not None
+):
+    llm = ChatBedrock(
+        region_name="ap-south-1",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        model_id="meta.llama3-70b-instruct-v1:0",
+        temperature=0.5,
+        max_tokens=1000,
+        verbose=True,
+    )
+else:
+    llm = ChatGroq(
+        model="llama-3.2-90b-text-preview",
+        temperature=1.5,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=os.getenv("GROQ_API_KEY"),
+    )
 
 # Define the system prompt
 system_prompt = """
