@@ -21,7 +21,7 @@ class KeywordGeneratorResponse(BaseModel):
         description="Whether the keyword is for an image search"
     )
 
-
+# Sometimes the bedrock is not available, so we use the groq API
 if (
     os.getenv("AWS_SECRET_ACCESS_KEY") is not None
     and os.getenv("AWS_ACCESS_KEY_ID") is not None
