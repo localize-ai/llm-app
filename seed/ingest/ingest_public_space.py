@@ -29,10 +29,10 @@ def generate_text_embedding(text):
     tokens = tokenizer.encode(
         text, truncation=True, max_length=77, add_special_tokens=True
     )
-    truncated_text = tokenizer.decode(tokens, skip_special_tokens=True)
+    tokens = tokens[:77]  # Ensure the token length matches the model's expected input length
 
     # Encode the truncated text
-    return model.encode(truncated_text, convert_to_tensor=True).tolist()
+    return model.encode(tokens, convert_to_tensor=True).tolist()
 
 
 def generate_image_embedding(image_url):
