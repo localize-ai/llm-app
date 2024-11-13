@@ -28,4 +28,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
 
-CMD [ "fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8080" ]
+CMD [ "sh", "-c", "python app/watchers/event_watch.py & fastapi run app/main.py --host 0.0.0.0 --port 8080" ]
