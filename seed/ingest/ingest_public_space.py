@@ -64,8 +64,9 @@ def process_and_insert_data(input_data):
         if place["thumbnail"] is not None:
             image_urls.insert(0, place["thumbnail"])
 
-        for review in place["user_reviews"]:
-            image_urls.extend(review.get("Images", []))
+        if place["user_reviews"] is not None:
+            for review in place["user_reviews"]:
+                image_urls.extend(review.get("Images", []))
 
         # Create the main dictionary structure
         place_doc = {
@@ -100,19 +101,37 @@ def process_and_insert_data(input_data):
             print(f"Error inserting place i: {index}: {e}")
             continue
 
-        # Generate text embedding
-        text = f"title: {place['title']}; description: {place['description']}; address: {place['address']}"
-        text_embedding = generate_text_embedding(text)
+        # Insert user reviews into the place_reviews collection
+        if place["user_reviews"] is not None:
+            place_reviews_collection.insert_many(
+                [
+                    {
+                        "place_id": place_id,
+                        "rating": review["Rating"],
+                        "review": review["Description"],
+                        "images": review.get("Images", []),
+                        "user": None,
+                    }
+                    for review in place["user_reviews"]
+                ]
+            )
 
-        # Insert text embedding as a separate document in the embeddings collection
-        embedding_collection.insert_one(
-            {
-                "place_id": place_id,
-                "type": "text",
-                "content": text,
-                "embedding": text_embedding,
-            }
-        )
+        try:
+            # Generate text embedding
+            text = f"title: {place['title']}; description: {place['description']}; address: {place['address']}"
+            text_embedding = generate_text_embedding(text)
+
+            # Insert text embedding as a separate document in the embeddings collection
+            embedding_collection.insert_one(
+                {
+                    "place_id": place_id,
+                    "type": "text",
+                    "content": text,
+                    "embedding": text_embedding,
+                }
+            )
+        except Exception as e:
+            print(f"Error generating text embedding for place {place['title']}: {e}")
 
         # Generate embeddings for each image URL
         for url in image_urls:
@@ -131,30 +150,22 @@ def process_and_insert_data(input_data):
                 continue
 
         # Insert text embedding for each user review with rating > 3
-        for review in place["user_reviews"]:
-            review_text = f"review: {review['Description']}; rating: {review['Rating']}"
-            review_embedding = generate_text_embedding(review_text)
-            embedding_collection.insert_one(
-                {
-                    "place_id": place_id,
-                    "type": "review_text",
-                    "content": review_text,
-                    "embedding": review_embedding,
-                }
-            )
-
-        place_reviews_collection.insert_many(
-            [
-                {
-                    "place_id": place_id,
-                    "rating": review["Rating"],
-                    "review": review["Description"],
-                    "images": review.get("Images", []),
-                    "user": None,
-                }
-                for review in place["user_reviews"]
-            ]
-        )
+        if place["user_reviews"] is not None:
+            for review in place["user_reviews"]:
+                review_text = f"review: {review['Description']}; rating: {review['Rating']}"
+                try:
+                    review_embedding = generate_text_embedding(review_text)
+                    embedding_collection.insert_one(
+                        {
+                            "place_id": place_id,
+                            "type": "review_text",
+                            "content": review_text,
+                            "embedding": review_embedding,
+                        }
+                    )
+                except Exception as e:
+                    print(f"Error generating text embedding for review: {review_text}: {e}")
+                    continue
 
         print(
             f"Processed {index} places in each place in {time.time() - each_place_start_time:.2f} seconds"
