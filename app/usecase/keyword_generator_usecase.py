@@ -37,7 +37,7 @@ if (
     )
 else:
     llm = ChatGroq(
-        model="llama-3.2-90b-text-preview",
+        model="llama-3.2-90b-vision-preview",
         temperature=1.5,
         max_tokens=None,
         timeout=None,
